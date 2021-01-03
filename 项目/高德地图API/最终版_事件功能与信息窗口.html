@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" />
+    <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
+    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.15&key=36aa77404a1c2f2fc922a569eaa49422&plugin=AMap.ArrivalRange,AMap.Scale,AMap.Geocoder,AMap.Transfer,AMap.Autocomplete,AMap.MouseTool,AMap.AdvancedInfoWindow"></script>
+    <style>
+        html,
+        body,
+        #container{
+            width: 100%;
+            height: 100%;
+        }
+        .amap-icon img,
+        .amap-marker-content img{
+            width: 25px;
+            height: 34px;
+        }
+
+        .marker {
+            position: absolute;
+            top: -20px;
+            right: -118px;
+            color: #fff;
+            padding: 4px 10px;
+            box-shadow: 1px 1px 1px rgba(10, 10, 10, .2);
+            white-space: nowrap;
+            font-size: 12px;
+            font-family: "";
+            background-color: #25A5F7;
+            border-radius: 3px;
+        }
+
+        .input-card{
+            width: 18rem;
+            z-index: 170;
+        }
+
+        .input-card .btn{
+            margin-right: .8rem;
+        }
+
+        .input-card .btn:last-child{
+            margin-right: 0;
+        }
+
+        .custom-input-card {
+            width: 22rem;
+        }
+
+        .custom-input-card .btn {
+            margin-right: 1rem;
+        }
+
+        .custom-input-card .btn:last-child {
+            margin-right: 0;
+        }
+
+        .info-title {
+            color: white;
+            font-size: 14px;
+            background-color: #25A5F7;
+            line-height: 26px;
+            padding: 0px 0 0 6px;
+            font-weight: lighter;
+            letter-spacing: 1px
+        }
+
+        .info-content {
+            font: 12px Helvetica, 'Hiragino Sans GB', 'Microsoft Yahei', '微软雅黑', Arial;
+            padding: 4px;
+            color: #666666;
+            line-height: 23px;
+        }
+
+        .info-content img {
+            float: left;
+            margin: 3px;
+        }
+
+        .amap-info-combo .keyword-input{
+            height: 25px;
+            border-radius: 2px 0 0 2px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <div class="info">
+        点击地图上的点标记，打开所添加的自定义信息窗体
+    </div>
+    <div class="input-card" style="width: auto;">
+        <div class="input-item">
+            <button class="btn" onclick="toggle()">显示/隐藏实时路况</button>
+            <input type="button" class="btn" onclick="drawCircle()" value="绘制圆形">
+        </div>
+        <div class="input-item">
+            <input id="addMarker" type="button" class="btn" onclick="addMarker()" value="添加点标记">
+            <input id="clearMarker" type="button" class="btn" onclick="clearMarker()" value="删除点标记">
+        </div>
+    </div>
+    <!-- 加载地图JSAPI脚本 -->
+    <script type="text/javascript">
+        // container为添加的地图容器的id
+        // 在创建的同时给题图设置中心点、级别、显示模式、自定义样式等属性
+        var map = new AMap.Map('container',{
+            resizeEnable: true, // 是否监控地图容器尺寸变化
+            zoom:16, // 级别
+            viewMode:'3D' // 使用3D视图
+        });
+        
+        // 实时路况图层
+        var trafficLayer = new AMap.TileLayer.Traffic({
+            zlindex:10
+        })
+        trafficLayer.setMap(map);
+        // 显示/隐藏道路
+        var isVisible = true;
+        function toggle(){
+            if(isVisible){
+                trafficLayer.hide();
+                isVisible = false;
+            }else{
+                trafficLayer.show();
+                isVisible = true;
+            }
+        }
+        // 绘制圆形
+        var mouseTool = new AMap.MouseTool(map)
+        function drawCircle(){
+            mouseTool.circle({
+                strokeColor: '#FF33FF',
+                strokeOpacity: 1,
+                strokeWeight: 6,
+                strokeOpacity: 0.2,
+                fillColor: '#1791fc',
+                fillOpacity: 0.4,
+                strokeStyle: 'solid'
+            })
+        }
+        mouseTool.on('draw',function(event){
+            // event.obj 为绘制出来的覆盖物对象
+            log.info('覆盖物对象绘制完成')
+        })
+        // 实例化点标记
+        function addMarker(){
+            marker = new AMap.Marker({
+                position: map.getCenter(),
+                icon: "//a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png",
+                offset: new AMap.Pixel(-13,-30),
+                // 设置可拖拽
+                draggable: true,
+                cursor: 'move',
+                // 设置拖拽效果
+                raiseOnDrag: true
+            });
+            marker.setMap(map);
+            // 鼠标点击maker弹出自定义的信息窗口
+            AMap.event.addListener(marker,'click',function(){
+                infowindow.open(map,marker.getPosition())
+            })
+        }
+        
+        // 清除 marker
+        function clearMarker() {
+            if (marker) {
+                marker.setMap(null);
+                marker = null;
+            }
+        }
+
+        //实例化信息窗体
+        var content = '<div class="info-title">高德地图</div><div class="info-content">' +
+        '<img src="https://webapi.amap.com/images/amap.jpg">' +
+        '高德是中国领先的数字地图内容、导航和位置服务解决方案提供商。<br/>' +
+        '<a target="_blank" href = "https://mobile.amap.com/">点击下载高德地图</a></div>';
+        var infowindow = new AMap.AdvancedInfoWindow({
+            content: content,
+            offset: new AMap.Pixel(0, -30)
+        });
+        
+    </script>
+</body>
+</html>

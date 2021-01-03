@@ -1,0 +1,1 @@
+python3 img2ascii.py 1.png 20 20

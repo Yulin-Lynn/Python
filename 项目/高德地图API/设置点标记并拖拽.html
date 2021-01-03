@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>默认点标记</title>
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
+    <style>
+        html,body,#container{
+            width: 100%;
+            height: 100%;
+        }
+
+        .amap-icon img,
+        .amap-marker-content img{
+            width: 25px;
+            height: 34px;
+        }
+
+        .marker{
+            position: absolute;
+            top: -20px;
+            right: -118px;
+            color: #fff;
+            padding: 4px 10px;
+            box-shadow: 1px 1px 1px rgba(10,10,10,.2);
+            white-space: nowrap;
+            font-size: 12px;
+            font-family: "";
+            background-color: #25A5F7;
+            border-radius: 3px;
+        }
+
+        .input-card{
+            width: 18rem;
+            z-index: 170;
+        }
+
+        .input-card .btn{
+            margin-right: 0.8rem;  
+        }
+
+        .input-card .btn:last-child{
+            margin-right: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+    <div class="input-card">
+        <label style="color:grey">点标记操作</label>
+        <div class="input-item">
+            <input id="addMarker" type="button" class="btn" onclick="addMarker()" value="添加点标记">
+            <input id="clearMarker" type="button" class="btn" onclick="clearMarker()" value="删除点标记">
+        </div>
+    </div>
+    <script src="http://webapi.amap.com/maps?v=1.3&key=36aa77404a1c2f2fc922a569eaa49422&plugin=AMap.ArrivalRange,AMap.Scale,AMap.Geocoder,AMap.Transfer,AMap.Autocomplete"></script>
+    <!-- <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=36aa77404a1c2f2fc922a569eaa49422&plugin=AMap.ArrivalRange,AMap.Scale,AMap.Geocoder,AMap.Transfer,AMap.Autocomplete"></script> -->
+    <script type="text/javascript">
+        // 在container中创建地图
+        var marker,map = new AMap.Map("container",{
+            resizeEnable: true,
+            center: [116.397428, 39.90923],
+            zoom: 13
+        });
+        // 实例化点标记
+        function addMarker(){
+            marker = new AMap.Marker({
+                position: map.getCenter(),
+                icon: "//a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png",
+                offset: new AMap.Pixel(-13,-30),
+                // 设置可拖拽
+                draggable: true,
+                cursor: 'move',
+                // 设置拖拽效果
+                raiseOnDrag: true
+            });
+            marker.setMap(map);
+        }
+        // 清除 marker
+        function clearMarker() {
+            if (marker) {
+                marker.setMap(null);
+                marker = null;
+            }
+        }
+        
+    </script>
+</body>
+</html>
